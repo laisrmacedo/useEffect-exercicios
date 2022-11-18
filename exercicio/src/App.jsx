@@ -23,34 +23,40 @@ function App() {
   const [inputValue, setInputValue] = useState("");
   const [filtro, setFiltro] = useState("")
 
-  // useEffect() => {
-  //   () => {
-
-  //   },
-  //   []
-  // };
-
-  // useEffect() => {
-  //   () => {
-
-  //   },
-  //   []
-  // };
-
   const onChangeInput = (event) => {
-    console.log("aaa");
+    setInputValue(event.target.value)
   }
 
   const criaTarefa = () => {
-    console.log("aaa");
-  }
+    const novaTarefa = {
+      id: Date.now(), 
+      texto: inputValue,
+      completa: false 
+    }
+    
+    // setTarefa([novaTarefa, ...tarefas])
 
+    const copiaDoEstado = [...tarefas]
+    copiaDoEstado.push(novaTarefa)
+    setTarefa(copiaDoEstado)
+    setInputValue("")
+  }
+  
   const selectTarefa = (id) => {
-    console.log("aaa");
+    const copiaTarefas = [...tarefas]
+
+    //Com FILTER --> retorna um array com o elemento
+    // const tarefa = copiaTarefas.filter((tarefa) => tarefa.id === id)
+    // tarefa[0].completa = !tarefa[0].completa
+
+    //Com FIND --> retorna o elemento do array
+    const tarefaEncontrada = copiaTarefas.find((tarefa) => tarefa.id === id)
+    tarefaEncontrada.completa = !tarefaEncontrada.completa
+    setTarefa(copiaTarefas)
   }
 
   const onChangeFilter = (event) => {
-    console.log("aaa");
+    setFiltro(event.target.value)
   }
 
 
@@ -65,6 +71,22 @@ function App() {
     }
   });
 
+  useEffect(() => {
+    let stringificado = JSON.stringify(tarefas);
+    if(tarefas.length > 0) {
+      localStorage.setItem("tarefas", stringificado);
+    }
+  }, [tarefas]);
+
+  useEffect(() => {
+    let paseado = JSON.parse(localStorage.getItem("tarefas"));
+    // console.log("paseado", paseado);
+    if(paseado !== null || paseado !== undefined){
+      setTarefa(paseado);
+    }
+  }, []);
+
+  // http://127.0.0.1:3000/
 
   return (
     <div className="App">
@@ -84,9 +106,11 @@ function App() {
         </select>
       </InputsContainer>
       <TarefaList>
-        {listaFiltrada.map(tarefa => {
+        {listaFiltrada
+        .map(tarefa => {
           return (
             <Tarefa
+              key={tarefa.id}
               completa={tarefa.completa}
               onClick={() => selectTarefa(tarefa.id)}
             >
